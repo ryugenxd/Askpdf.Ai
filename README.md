@@ -49,7 +49,7 @@ ChatPDF adalah aplikasi berbasis web yang memungkinkan pengguna untuk berinterak
 
 1. Jalankan server Flask:
    ```bash
-   python app.py
+   python main.py
    ```
 
 2. Akses aplikasi melalui browser di:
