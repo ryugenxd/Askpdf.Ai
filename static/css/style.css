@@ -44,7 +44,7 @@ body {
 }
 
 .book-name {
-    font-size: 20px;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -249,13 +249,17 @@ em {
     color: #555;
 }
 
-ol {
-    padding-left: 20px;
-    margin: 5px 0;
+ol, ul {
+    padding-left: 20px; /* Biar list agak menjorok ke kanan */
+    list-style: decimal; /* Untuk daftar terurut */
 }
 
-li {
-    margin-bottom: 4px;
+ul {
+    list-style: disc; /* Untuk daftar tidak terurut */
+}
+
+li::marker {
+    content: normal; /* Hindari overriding custom marker */
 }
 
 /* Responsive Styles */

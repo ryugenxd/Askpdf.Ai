@@ -7,25 +7,45 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import pdfplumber
 
-# Inisialisasi global
 vectorizer = TfidfVectorizer()
 index = None
 embedding_metadata = []
 
 INDEX_PATH = "faiss_index.bin"
 METADATA_PATH = "embedding_metadata.json"
-VECTORIZER_PATH = "vectorizer_vocab.json"  # Simpan vocab TF-IDF
+VECTORIZER_PATH = "vectorizer_vocab.json"
 
-# Fungsi untuk menyimpan index dan metadata
+def extract_intro_text(file_path, max_chars=1000):
+    try:
+        with fitz.open(file_path) as pdf:
+            if pdf.page_count > 0:
+                text = pdf[0].get_text("text")
+                return text[:max_chars] if text else "Teks tidak tersedia."
+            return "PDF kosong."
+    except Exception as e:
+        print(f"Error saat mengekstrak teks: {e}")
+        return "Gagal mengekstrak teks."
+
+def extract_pdf_title(file_path):
+    try:
+        with fitz.open(file_path) as doc:
+            title = doc.metadata.get('title')
+            if not title or not title.strip():
+                text = doc.load_page(0).get_text()
+                title = text.split('\n')[0] if text else 'Dokumen Tanpa Judul'
+            return title.strip()
+    except Exception as e:
+        print(f"Error mengambil judul: {e}")
+        return "Dokumen Tanpa Judul"
+
 def save_faiss_index():
     if index is not None:
         faiss.write_index(index, INDEX_PATH)
     with open(METADATA_PATH, "w", encoding="utf-8") as meta_file:
         json.dump(embedding_metadata, meta_file, ensure_ascii=False, indent=4)
     with open(VECTORIZER_PATH, "w", encoding="utf-8") as vocab_file:
-        json.dump(vectorizer.vocabulary_, vocab_file)  # Simpan vocab TF-IDF
+        json.dump(vectorizer.vocabulary_, vocab_file)
 
-# Fungsi untuk memuat index dan metadata
 def load_faiss_index():
     global index, embedding_metadata, vectorizer
     if Path(INDEX_PATH).exists():
@@ -36,43 +56,30 @@ def load_faiss_index():
     if Path(VECTORIZER_PATH).exists():
         with open(VECTORIZER_PATH, "r", encoding="utf-8") as vocab_file:
             vocab = json.load(vocab_file)
-            
-            if vocab:  # ✅ Hanya lakukan fit jika vocabulary tidak kosong
-                vectorizer = TfidfVectorizer(vocabulary=vocab)
+            vectorizer = TfidfVectorizer(vocabulary=vocab)
+            if vocab:
                 try:
-                    dummy_data = list(vocab.keys())
-                    vectorizer.fit(dummy_data)  # ✅ Pastikan vectorizer valid
+                    vectorizer.fit(list(vocab.keys()))
                 except ValueError:
-                    print("Error: Vocabulary tidak valid. Vectorizer di-reset.")
-                    vectorizer = TfidfVectorizer()  # Reset vectorizer jika error
+                    vectorizer = TfidfVectorizer()
             else:
-                vectorizer = TfidfVectorizer()  # Inisialisasi ulang jika kosong 
+                vectorizer = TfidfVectorizer()
 
-# Fungsi untuk menghasilkan embedding dan menambahkan metadata
 def generate_embeddings(pdf_path, pdf_id):
     global index, vectorizer
-    doc = fitz.open(pdf_path)
-    pdf_name = Path(pdf_path).stem
-
-    # Ubah path ke embeddings/{pdf_id}/json
     base_folder = Path("embeddings") / pdf_id
     txt_folder = base_folder / "txt"
     json_folder = base_folder / "json"
     txt_folder.mkdir(parents=True, exist_ok=True)
     json_folder.mkdir(parents=True, exist_ok=True)
 
-    # Menggunakan pdfplumber untuk ekstraksi teks
     all_texts = []
     with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text()
-            if text:
-                all_texts.append(text.strip())
+        all_texts = [page.extract_text().strip() for page in pdf.pages if page.extract_text()]
 
     if not all_texts:
         return
 
-    # Update vocabulary jika belum ada
     vectorizer.fit(all_texts)
     vectors = vectorizer.transform(all_texts).toarray()
 
@@ -82,56 +89,60 @@ def generate_embeddings(pdf_path, pdf_id):
 
     index.add(np.array(vectors, dtype='float32'))
 
-    # Menambahkan metadata untuk setiap teks halaman
     for i, text in enumerate(all_texts):
         embedding_metadata.append({
             "doc_id": pdf_id,
             "page_number": i + 1,
             "text": text,
-            "path": f"{pdf_name}.pdf"
+            "path": f"{Path(pdf_path).stem}.pdf"
         })
 
-    # Menyimpan FAISS index dan metadata
     save_faiss_index()
     save_metadata_json(pdf_id, pdf_path)
 
-# Fungsi untuk menyimpan metadata JSON
 def save_metadata_json(pdf_id, pdf_path):
-    pdf_name = Path(pdf_path).stem
     json_folder = Path("embeddings") / pdf_id / "json"
     json_folder.mkdir(parents=True, exist_ok=True)
-
     metadata = {
         "id": pdf_id,
-        "path": f"{pdf_name}.pdf",
-        "name": pdf_name,
-        "json_folder": f"embeddings/{pdf_id}/json"
+        "path": f"{Path(pdf_path).stem}.pdf",
+        "name": Path(pdf_path).stem,
+        "json_folder": str(json_folder)
     }
-
-    metadata_file = json_folder / "metadata.json"
-    with open(metadata_file, "w", encoding="utf-8") as file:
+    with open(json_folder / "metadata.json", "w", encoding="utf-8") as file:
         json.dump(metadata, file, ensure_ascii=False, indent=4)
 
-# Fungsi untuk pencarian dengan FAISS
-def search_with_faiss(pdf_path, query, pdf_id, top_k=5):
+def search_with_faiss(pdf_path, query, pdf_id, top_k=3):
     global index, embedding_metadata, vectorizer
-    load_faiss_index()
+    load_faiss_index()  # Pastikan index dan metadata dimuat
 
+    print(f"🔍 Pencarian untuk PDF ID: {pdf_id}, Query: '{query}'")
+
+    # Tambahan: Pastikan metadata selalu dimuat
+    metadata_path = Path(f"embeddings/{pdf_id}/json/metadata.json")
+    if metadata_path.exists():
+        with open(metadata_path, "r", encoding="utf-8") as file:
+            pdf_metadata = json.load(file)
+    else:
+        print("⚠️ Metadata JSON tidak ditemukan.")
+        return [{"error": "Metadata PDF tidak ditemukan."}]
+
+    # Filter metadata untuk PDF tertentu
     pdf_metadata = [meta for meta in embedding_metadata if meta["doc_id"] == pdf_id]
-    all_texts = [meta["text"] for meta in pdf_metadata]
 
-    if not all_texts:
+    if not pdf_metadata:
+        print("⚠️ Tidak ada metadata untuk PDF ini.")
         return [{"error": "Tidak ada data untuk PDF ini."}]
 
-    # Gunakan vectorizer yang sudah ada
+    # Proses pencarian FAISS
     query_vector = vectorizer.transform([query]).toarray()[0]
 
-    # Pad atau trim agar sesuai dengan dimensi index
     if index.d != len(query_vector):
+        print(f"⚠️ Dimensi tidak cocok: Index {index.d}, Query {len(query_vector)}")
         if len(query_vector) > index.d:
-            query_vector = query_vector[:index.d]  # Trim
+            query_vector = query_vector[:index.d]
         else:
-            query_vector = np.pad(query_vector, (0, index.d - len(query_vector)), 'constant')  # Padding
+            query_vector = np.pad(query_vector, (0, index.d - len(query_vector)), 'constant')
 
     results = []
     if np.count_nonzero(query_vector) > 0:
@@ -144,26 +155,19 @@ def search_with_faiss(pdf_path, query, pdf_id, top_k=5):
 
     return results if results else [{"error": "Tidak ditemukan hasil relevan."}]
 
-# Menambahkan algoritma machine learning (contoh: KMeans clustering) untuk kategorisasi dokumen PDF
 def categorize_pdf_elements(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
-        all_texts = [page.extract_text().strip() for page in pdf.pages if page.extract_text().strip()]
+        all_texts = [page.extract_text().strip() for page in pdf.pages if page.extract_text()]
 
     if not all_texts:
         return []
 
     vectors = vectorizer.transform(all_texts).toarray()
-
-    # KMeans untuk mengelompokkan elemen berdasarkan teks
-    kmeans = KMeans(n_clusters=5, random_state=42)  # Misal 5 cluster
+    kmeans = KMeans(n_clusters=5, random_state=42)
     labels = kmeans.fit_predict(vectors)
 
-    categorized_elements = []
-    for idx, label in enumerate(labels):
-        categorized_elements.append({
-            "page_number": idx + 1,
-            "category": f"Cluster {label}",
-            "text": all_texts[idx]
-        })
-
-    return categorized_elements
+    return [{
+        "page_number": idx + 1,
+        "category": f"Cluster {label}",
+        "text": all_texts[idx]
+    } for idx, label in enumerate(labels)]

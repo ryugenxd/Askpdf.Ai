@@ -27,13 +27,18 @@ function handleFileUpload() {
         .then(response => response.json())
         .then(data => {
             if (data.pdf_id) {
+                console.log(data);
                 localStorage.setItem('pdf_id', data.pdf_id);
+                localStorage.setItem('filename', data.detected_title); // Simpan judul asli PDF
+                namafile = data.detected_title;
                 alert('✅ PDF berhasil diunggah!');
+                updateBookName();
                 loadHistory();
+                return namafile
             } else {
                 console.error('❌ Upload gagal:', data.error);
             }
-        })
+        })        
         .catch(error => console.error('❌ Error:', error));
     } else {
         alert('🚨 Harap pilih file PDF.');
@@ -115,22 +120,27 @@ function formatMarkdown(text) {
     text = text.replace(/(^|\n)([A-Z][\w\s]+):/g, '<strong>$2:</strong>');
 
     // Daftar terurut (1. Item, 2. Item)
-    text = text.replace(/((?:\d+\.\s.*(?:\n|$))+)/g, match => {
-        const items = match.trim().split('\n').map(item => item.replace(/\d+\.\s(.*)/, '<li>$1</li>')).join('');
-        return `<ol>${items}</ol>`;
+    text = text.replace(/(\d+\.\s.*(?:\n(?!\d+\.).*)*)/g, match => {
+        const items = match.trim().split(/\n(?=\d+\.\s)/).map(item => {
+            return item.replace(/^\d+\.\s(.*)/, '<li>$1</li>'); // Pastikan hanya mencocokkan awal baris
+        }).join('');
+        return `<ol>${items}</ol>`;  // Pastikan semua item berada dalam satu <ol>
     });
 
     // Daftar tidak terurut (- Item)
-    text = text.replace(/((?:- .*(?:\n|$))+)/g, match => {
-        const items = match.trim().split('\n').map(item => item.replace(/- (.*)/, '<li>$1</li>')).join('');
+    text = text.replace(/(-\s.*(?:\n(?!- ).*)*)/g, match => {
+        const items = match.trim().split(/\n(?=-\s)/).map(item => {
+            return item.replace(/^- (.*)/, '<li>$1</li>'); // Sama seperti di atas, pastikan formatnya benar
+        }).join('');
         return `<ul>${items}</ul>`;
     });
 
-    // Line breaks
-    text = text.replace(/\n/g, '<br>');
+    // Line breaks di luar <li>
+    text = text.replace(/(?!<\/li>)\n/g, '<br>');
 
     return text.trim();
 }
+
 
 // 🚩 Indikator "Typing" untuk AI
 function showTypingIndicator() {
@@ -143,22 +153,29 @@ function hideTypingIndicator() {
 
 // 🚩 Fungsi Load Riwayat Chat
 function loadHistory() {
+    // const namabuku = namafile;
     fetch('/history')
         .then(response => response.json())
         .then(data => {
             historyContainer.innerHTML = '';
             historyContainer.style.display = 'flex';
 
-            const pdfId = localStorage.getItem('pdf_id');
-            const filteredHistory = data.history.filter(entry => entry.id === pdfId);
-
-            filteredHistory.forEach(entry => {
+            data.history.forEach(entry => {
                 const historyItem = document.createElement('div');
                 historyItem.classList.add('room');
+                historyItem.dataset.pdfId = entry.id;  // Simpan pdf_id di atribut data
+
                 historyItem.innerHTML = `
-                    <strong>❓ ${entry.question}</strong>
+                    <strong>📄 ${entry.question || 'Tidak Diketahui'}</strong><br>
                     <small>🗓️ ${new Date(entry.timestamp).toLocaleString()}</small>
                 `;
+
+                // Event saat diklik, arahkan ke room sesuai pdf_id
+                historyItem.addEventListener('click', function () {
+                    const pdfId = this.dataset.pdfId;
+                    window.location.href = `/room/${pdfId}`;
+                });
+
                 historyContainer.appendChild(historyItem);
             });
 
@@ -166,3 +183,11 @@ function loadHistory() {
         })
         .catch(error => console.error('❌ Gagal memuat riwayat:', error));
 }
+
+function updateBookName() {
+    const bookNameElement = document.querySelector('.book-name');
+    const filename = localStorage.getItem('filename');
+    bookNameElement.textContent = filename || 'Nama Buku';
+}
+
+document.addEventListener('DOMContentLoaded', updateBookName);

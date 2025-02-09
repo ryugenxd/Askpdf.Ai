@@ -2,12 +2,14 @@ import os
 import json
 import uuid
 from datetime import datetime
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, current_app
 from werkzeug.utils import secure_filename
 from .pdf.ai import ask_pollinations
 from .pdf.pdfparser import (
     generate_embeddings,        # Konsisten dengan pdfparser.py
-    search_with_faiss           # Konsisten dengan pdfparser.py
+    search_with_faiss,          # Konsisten dengan pdfparser.py
+    extract_pdf_title,
+    save_metadata_json
 )
 
 UPLOAD_FOLDER = "./storage"
@@ -36,28 +38,36 @@ def save_to_history(entry):
         f.seek(0)
         json.dump(history, f, ensure_ascii=False, indent=4)
 
-# API 1️⃣: Upload PDF
 @main.route("/upload", methods=["POST"])
 def upload_pdf():
-    if "file" not in request.files:
-        return jsonify({"error": "Harap unggah file PDF."}), 400
+    if 'file' not in request.files:
+        return jsonify({"error": "Tidak ada file yang diunggah"}), 400
 
-    file = request.files["file"]
-    if file.filename == "" or not allowed_file(file.filename):
-        return jsonify({"error": "File harus berformat PDF."}), 400
-
-    # 🔑 Buat ID unik untuk PDF
-    pdf_id = str(uuid.uuid4())
+    file = request.files['file']
     filename = secure_filename(file.filename)
-    file_path = os.path.join(UPLOAD_FOLDER, f"{pdf_id}.pdf")
+    pdf_id = generate_pdf_id()  # ID unik untuk PDF
+
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], f"{pdf_id}.pdf")
     file.save(file_path)
 
-    # Ekstraksi & penyimpanan data
-    generate_embeddings(file_path, pdf_id)  # 🔥 Buat embedding untuk pencarian nanti
+    # 🔍 Kirim ke API dengan filename sebagai referensi
+    prompt = (
+        f"Aku Aseko, asisten AI yang ahli menganalisis PDF. "
+        f"Coba tebak judul buku dari nama file ini secara lengkap: '{filename}'. "
+        "Berikan jawaban singkat, hanya nama bukunya saja tanpa deskripsi tambahan."
+    )
+    book_title = ask_pollinations(prompt)
+
+    generate_embeddings(file_path, pdf_id)
+
+    # ✅ Simpan Metadata
+    save_metadata_json(pdf_id, file_path)
 
     return jsonify({
         "message": "PDF berhasil diunggah!",
-        "pdf_id": pdf_id
+        "pdf_id": pdf_id,
+        "detected_title": book_title,  # ✅ Judul buku hasil prediksi AI
+        "filename": filename
     }), 200
 
 # API 2️⃣: Ajukan Pertanyaan dengan FAISS
@@ -150,6 +160,14 @@ def get_history():
         history = json.load(f)
     return jsonify({"history": history})
 
+@main.route("/room/<pdf_id>")
+def room(pdf_id):
+    file_path = os.path.join(UPLOAD_FOLDER, f"{pdf_id}.pdf")
+    if not os.path.exists(file_path):
+        return "PDF tidak ditemukan", 404
+
+    return render_template("base.html", pdf_id=pdf_id)
+
 # API 4️⃣: Hapus Riwayat
 @main.route("/clear-history", methods=["DELETE"])
 def clear_history():
@@ -161,3 +179,7 @@ def clear_history():
 @main.route('/')
 def index():
     return render_template('base.html')
+
+# Fungsi untuk generate ID unik untuk setiap PDF
+def generate_pdf_id():
+    return str(uuid.uuid4())

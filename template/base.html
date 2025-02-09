@@ -15,7 +15,7 @@
                     <ion-icon name="library"></ion-icon>
                 </div>
                 <span class="book-name">
-                    {{ filename if filename else 'Nama Buku' }}
+                    <!-- dinamis -->
                 </span>
                 <div class="new-chat">
                     <ion-icon name="add"></ion-icon>
@@ -58,12 +58,22 @@
 
                 </div> -->
                 <ion-icon name="cloud-upload" id="upload"></ion-icon>
-                <input type="file" id="file-upload" style="display: none;" accept="application/pdf">
+                <input type="file" id="file-upload" style="display: none;" accept="application/pdf" enctype="multipart/form-data">
                 <input type="text" name="chat" id="chat-input" placeholder="Tulis pesan...">
                 <ion-icon name="send" id="send-button"></ion-icon>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pdfId = "{{ pdf_id }}";
+            if (pdfId) {
+                localStorage.setItem('pdf_id', pdfId);
+                loadHistory();
+            }
+        });
+    </script>    
 
     <script src="{{ url_for('static', filename='js/script.js')}}"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
