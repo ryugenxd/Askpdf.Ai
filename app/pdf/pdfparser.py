@@ -54,8 +54,10 @@ def generate_embeddings(pdf_path, pdf_id):
     doc = fitz.open(pdf_path)
     pdf_name = Path(pdf_path).stem
 
-    txt_folder = Path(pdf_name) / "txt"
-    json_folder = Path(pdf_name) / "json"
+    # Ubah path ke embeddings/{pdf_id}/json
+    base_folder = Path("embeddings") / pdf_id
+    txt_folder = base_folder / "txt"
+    json_folder = base_folder / "json"
     txt_folder.mkdir(parents=True, exist_ok=True)
     json_folder.mkdir(parents=True, exist_ok=True)
 
@@ -96,14 +98,14 @@ def generate_embeddings(pdf_path, pdf_id):
 # Fungsi untuk menyimpan metadata JSON
 def save_metadata_json(pdf_id, pdf_path):
     pdf_name = Path(pdf_path).stem
-    json_folder = Path(pdf_name) / "json"
+    json_folder = Path("embeddings") / pdf_id / "json"
     json_folder.mkdir(parents=True, exist_ok=True)
 
     metadata = {
         "id": pdf_id,
         "path": f"{pdf_name}.pdf",
         "name": pdf_name,
-        "json_folder": f"{pdf_name}/json"
+        "json_folder": f"embeddings/{pdf_id}/json"
     }
 
     metadata_file = json_folder / "metadata.json"

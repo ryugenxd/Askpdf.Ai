@@ -17,3 +17,4 @@ app/pdf/__pycache__/
 
 # Abaikan folder storage di root folder
 /storage
+/vectorizer_vocab.json

@@ -1,5 +1,7 @@
 # ChatPDF
 
+![AskPdf.AI](logo.jpg)
+
 ChatPDF adalah aplikasi berbasis web yang memungkinkan pengguna untuk berinteraksi dengan file PDF melalui chat. Aplikasi ini menggunakan Flask untuk backend, FAISS untuk pencarian berbasis vektor, dan PyMuPDF untuk ekstraksi teks dari file PDF.
 
 ## Fitur
@@ -40,6 +42,7 @@ ChatPDF adalah aplikasi berbasis web yang memungkinkan pengguna untuk berinterak
 - faiss-cpu
 - PyMuPDF
 - scikit-learn
+- pdfplumber
 
 ## Cara Penggunaan
 
@@ -58,7 +61,7 @@ ChatPDF adalah aplikasi berbasis web yang memungkinkan pengguna untuk berinterak
 ## API Endpoint
 
 - **POST /upload**: Upload file PDF.
-- **POST /chat**: Kirim pertanyaan untuk mendapatkan jawaban berbasis isi PDF.
+- **POST /ask**: Kirim pertanyaan untuk mendapatkan jawaban berbasis isi PDF.
 - **GET /history**: Mendapatkan history chat untuk file tertentu.
 
 ## Kontribusi
