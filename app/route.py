@@ -53,7 +53,7 @@ def upload_pdf():
     file.save(file_path)
 
     # Ekstraksi & penyimpanan data
-    generate_embeddings(file_path)  # 🔥 Buat embedding untuk pencarian nanti
+    generate_embeddings(file_path, pdf_id)  # 🔥 Buat embedding untuk pencarian nanti
 
     return jsonify({
         "message": "PDF berhasil diunggah!",
@@ -100,7 +100,7 @@ def ask_question():
         return jsonify({"error": "Parameter top_k harus berupa angka."}), 400
 
     # 🔍 Cari teks paling relevan menggunakan FAISS
-    relevant_text = search_with_faiss(file_path, question, top_k=top_k)
+    relevant_text = search_with_faiss(file_path, question, pdf_id, top_k=top_k)
 
     if isinstance(relevant_text, list) and "error" in relevant_text[0]:
         return jsonify({"error": relevant_text[0]["error"]}), 400

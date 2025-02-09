@@ -72,6 +72,8 @@ body {
     cursor: pointer;
     gap: 5px;
     color: white;
+    display: flex;
+    flex-direction: column;
 }
 
 .history-container {
@@ -106,7 +108,7 @@ body {
     flex-direction: column;
     gap: 15px;
     overflow-y: auto;
-    max-height: calc(100vh - 150px);
+    max-height: calc(100vh - 120px);
     padding: 10px;
     background: #fff;
     border-radius: 8px;

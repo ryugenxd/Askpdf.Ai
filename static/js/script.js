@@ -63,6 +63,7 @@ function sendMessage() {
             if (data.answer?.trim()) {
                 appendMessage('ai', formatMarkdown(data.answer));
                 chatInput.value = '';
+                chatContainer.style.display = 'flex';
                 loadHistory();
             } else {
                 appendMessage('ai', '⚠️ Maaf, saya tidak menemukan jawaban yang sesuai.');
@@ -102,7 +103,7 @@ function appendMessage(sender, message) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// 🚩 Fungsi Format Markdown & Dinamis
+
 function formatMarkdown(text) {
     // **Bold**
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -114,10 +115,16 @@ function formatMarkdown(text) {
     text = text.replace(/(^|\n)([A-Z][\w\s]+):/g, '<strong>$2:</strong>');
 
     // Daftar terurut (1. Item, 2. Item)
-    text = text.replace(/(\d+)\.\s(.*?)(?=\n|$)/g, '<ol><li>$2</li></ol>');
+    text = text.replace(/((?:\d+\.\s.*(?:\n|$))+)/g, match => {
+        const items = match.trim().split('\n').map(item => item.replace(/\d+\.\s(.*)/, '<li>$1</li>')).join('');
+        return `<ol>${items}</ol>`;
+    });
 
     // Daftar tidak terurut (- Item)
-    text = text.replace(/^- (.*)/gm, '<ul><li>$1</li></ul>');
+    text = text.replace(/((?:- .*(?:\n|$))+)/g, match => {
+        const items = match.trim().split('\n').map(item => item.replace(/- (.*)/, '<li>$1</li>')).join('');
+        return `<ul>${items}</ul>`;
+    });
 
     // Line breaks
     text = text.replace(/\n/g, '<br>');
