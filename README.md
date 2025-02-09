@@ -1,6 +1,6 @@
 # ChatPDF
 
-![AskPdf.AI](logo.jpg)
+![AskPdf.AI](https://github.com/lahadiyani/Askpdf.Ai/blob/main/static/image/logo.jpg)
 
 ChatPDF adalah aplikasi berbasis web yang memungkinkan pengguna untuk berinteraksi dengan file PDF melalui chat. Aplikasi ini menggunakan Flask untuk backend, FAISS untuk pencarian berbasis vektor, dan PyMuPDF untuk ekstraksi teks dari file PDF.
 
