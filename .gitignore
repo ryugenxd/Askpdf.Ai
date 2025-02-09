@@ -1,0 +1,19 @@
+# Abaikan folder __pycache__ di dalam app dan app/pdf
+app/__pycache__/
+app/pdf/__pycache__/
+
+# Abaikan file backup.py di root folder
+/backup.py
+
+# Abaikan file embedding_metadata.json di root folder
+/embedding_metadata.json
+
+# Abaikan file faiss_index.bin di root folder
+/faiss_index.bin
+
+# Abaikan file history.json di root folder
+/history.json
+/test.py
+
+# Abaikan folder storage di root folder
+/storage

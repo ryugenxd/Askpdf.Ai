@@ -1,0 +1,374 @@
+/* General styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fb;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 300px;
+    background-color: #2e3b4e;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 100vh;
+}
+
+.tool-box {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #2A3335;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.icon-sidebar {
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.book-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.new-chat {
+    transform: translateY(15%);
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.new-chat ion-icon {
+    margin-right: 10px;
+}
+
+.room-chat {
+    display: none;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.room {
+    transform: translateY(50%);
+    background: #2A3335;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    gap: 5px;
+    color: white;
+}
+
+.history-container {
+    margin-top: auto;
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+.history {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.history ion-icon {
+    font-size: 18px;
+}
+
+/* Area Chat */
+.area-chat {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 20px;
+    gap: 10px;
+}
+
+.container-chat {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    max-height: calc(100vh - 150px);
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.jumbotron-chat {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 5;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.text {
+    font-size: 15px;
+    color: #464748;
+}
+
+.account-profile {
+    background-color: red;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 5;
+    display: flex;
+    right: 0;
+    transform: translateX(-50%);
+    cursor: pointer;
+}
+
+.account-profile:hover {
+    border: 2px solid black;
+}
+
+.image-box {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+}
+
+.person-chat, .ai-chat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px;
+}
+
+.person-chat {
+    justify-content: flex-end;
+}
+
+.ai-chat {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    display: inline-block;
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 5px 5px;
+    word-wrap: break-word;
+}
+
+.person-message {
+    background-color: #d5dadf;
+    color: rgb(6, 6, 6);
+    align-self: flex-end;
+}
+
+.ai-message {
+    background-color: #d5dadf;
+    color: rgb(6, 6, 6);
+    align-self: flex-start;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+    transform: translateY(600px) translateX(20px);
+    position: fixed;
+}
+
+.input-container input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+.input-container ion-icon {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* History Chat Enhancement */
+.history-item {
+    background: #2a3335;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.3s;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    
+}
+
+.history-item:hover {
+    background: #3b4648;
+} 
+
+/* Styling Markdown */
+strong {
+    font-weight: bold;
+    color: #222;
+}
+
+em {
+    font-style: italic;
+    color: #555;
+}
+
+ol {
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+li {
+    margin-bottom: 4px;
+}
+
+/* Responsive Styles */
+
+/* Untuk layar dengan lebar maksimal 1200px */
+@media (max-width: 1200px) {
+    .sidebar {
+        width: 250px;
+    }
+    .input-container {
+        max-width: 1000px;
+        transform: translateY(500px) translateX(10px);
+    }
+}
+
+/* Untuk layar dengan lebar maksimal 992px */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 200px;
+    }
+    .book-name {
+        font-size: 18px;
+    }
+    .input-container {
+        max-width: 800px;
+        transform: translateY(450px) translateX(10px);
+    }
+    .title {
+        font-size: 22px;
+    }
+    .text {
+        font-size: 14px;
+    }
+}
+
+/* Untuk layar dengan lebar maksimal 768px */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        max-height: none;
+    }
+    .area-chat {
+        padding: 10px;
+    }
+    .input-container {
+        max-width: 100%;
+        transform: translateY(400px) translateX(0);
+        padding: 8px;
+    }
+    .input-container input {
+        font-size: 14px;
+    }
+    .icon-sidebar, .new-chat ion-icon, .history ion-icon {
+        font-size: 20px;
+    }
+}
+
+/* Untuk layar dengan lebar maksimal 576px (smartphone) */
+@media (max-width: 576px) {
+    .sidebar {
+        padding: 10px;
+        gap: 5px;
+    }
+    .tool-box {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    .book-name {
+        font-size: 16px;
+    }
+    .input-container {
+        transform: translateY(350px) translateX(0);
+        padding: 6px;
+    }
+    .input-container input {
+        font-size: 12px;
+        padding: 8px;
+    }
+    .message-bubble {
+        max-width: 85%;
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+    .title {
+        font-size: 20px;
+    }
+    .text {
+        font-size: 13px;
+    }
+}
+
+/* Untuk layar sangat kecil (max 400px) */
+@media (max-width: 400px) {
+    .sidebar {
+        padding: 5px;
+    }
+    .icon-sidebar, .new-chat ion-icon, .history ion-icon {
+        font-size: 18px;
+    }
+    .input-container {
+        transform: translateY(300px) translateX(0);
+        padding: 4px;
+    }
+    .input-container input {
+        font-size: 12px;
+        padding: 6px;
+    }
+    .message-bubble {
+        max-width: 90%;
+        font-size: 13px;
+    }
+}
