@@ -10,6 +10,7 @@ ChatPDF adalah aplikasi berbasis web yang memungkinkan pengguna untuk berinterak
 - Pencarian informasi menggunakan embedding vektor dengan FAISS.
 - Chat interaktif dengan respons yang relevan berdasarkan isi PDF.
 - Manajemen history chat per file PDF.
+- Penambahan Room Chat
 
 ## Instalasi
 
