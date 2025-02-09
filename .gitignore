@@ -13,8 +13,15 @@ app/pdf/__pycache__/
 
 # Abaikan file history.json di root folder
 /history.json
+
+# Abaikan file test.py di root folder
 /test.py
 
 # Abaikan folder storage di root folder
 /storage
+
+# Abaikan file vectorizer_vocab.json di root folder
 /vectorizer_vocab.json
+
+# data embbedings
+/embeddings/
