@@ -1,6 +1,3 @@
 Flask
-numpy
-faiss-cpu
 PyMuPDF
-scikit-learn
 pdfplumber
