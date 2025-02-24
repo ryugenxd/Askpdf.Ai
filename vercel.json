@@ -10,6 +10,12 @@
         "use": "@vercel/static"
       }
     ],
+    "functions": {
+        "api/*.py": {
+            "runtime": "@vercel/python",
+            "externalPackages": ["numpy", "faiss-cpu", "scikit-learn"]
+        }
+    },
     "routes": [
       {
         "src": "/(.*)",
