@@ -25,3 +25,4 @@ app/pdf/__pycache__/
 
 # data embbedings
 /embeddings/
+/venv

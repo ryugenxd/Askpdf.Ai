@@ -29,7 +29,8 @@ ChatPDF adalah aplikasi berbasis web yang memungkinkan pengguna untuk berinterak
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/macOS
-   venv\Scripts\activate     # Windows
+   .\venv\Scripts\activate.bat # Windows
+   .\venv\Stripts\Activate.ps1 # Windows Powershell
    ```
 
 3. Instal dependensi:
