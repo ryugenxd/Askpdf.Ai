@@ -1,82 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AskPDF.ai - Chat With Any Pdf</title>
-    <link rel="shortcut icon" href="{{url_for('static', filename='image/logo.jpg')}}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
-</head>
-<body>
+    <link
+      rel="shortcut icon"
+      href="{{url_for('static', filename='image/logo.jpg')}}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css')}}"
+    />
+  </head>
+  <body>
     <div class="container">
-        <div class="sidebar">
-            <div class="tool-box">
-                <div class="icon-sidebar">
-                    <ion-icon name="library"></ion-icon>
-                </div>
-                <span class="book-name">
-                    <!-- dinamis -->
-                </span>
-                <div class="new-chat">
-                    <ion-icon name="add"></ion-icon>
-                </div>
-            </div>
-            <div class="room-chat">
-                <div class="room">
-                    
-                </div>
-            </div>
-            <div class="history-container">
-                <div class="history">
-                    Settings
-                    <ion-icon name="ellipsis-horizontal"></ion-icon>
-                </div>
-            </div>
+      <div class="sidebar">
+        <div class="tool-box">
+          <div class="icon-sidebar">
+            <ion-icon name="library"></ion-icon>
+          </div>
+          <span class="book-name">
+            <!-- dinamis -->
+          </span>
+          <div class="new-chat">
+            <ion-icon name="add"></ion-icon>
+          </div>
+        </div>
+        <div class="room-chat">
+          <div class="room"></div>
+        </div>
+        <div class="history-container">
+          <div class="history">
+            Settings
+            <ion-icon name="ellipsis-horizontal"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="area-chat">
+        <div class="jumbotron-chat">
+          <div class="title-text">
+            <h3 class="title">AskPDF.ai</h3>
+          </div>
+          <div class="text-info">
+            <p class="text">You Can Chat With Any Pdf</p>
+          </div>
         </div>
 
-        <div class="area-chat">
-            <div class="jumbotron-chat">
-                <div class="title-text">
-                    <h3 class="title">AskPDF.ai</h3>
-                </div>
-                <div class="text-info">
-                    <p class="text">You Can Chat With Any Pdf</p>
-                </div>
-            </div>
+        <div class="account-profile">
+          <img
+            src="https://i.pinimg.com/originals/f2/ac/62/f2ac625b38cd8a27e0e7840f878e0b1f.jpg"
+            alt="agatsuma"
+            class="image-box"
+          />
+        </div>
 
-            <div class="account-profile">
-                <img src="https://i.pinimg.com/originals/f2/ac/62/f2ac625b38cd8a27e0e7840f878e0b1f.jpg" alt="agatsuma" class="image-box">
-            </div>
+        <div class="container-chat" id="chat-container">
+          <!-- Riwayat chat akan ditambahkan secara dinamis di sini -->
+          <div
+            class="typing-indicator"
+            id="typing-indicator"
+            style="display: none"
+          >
+            AI sedang mengetik...
+          </div>
+        </div>
 
-            <div class="container-chat" id="chat-container">
-                <!-- Riwayat chat akan ditambahkan secara dinamis di sini -->
-                <div class="typing-indicator" id="typing-indicator" style="display: none;">AI sedang mengetik...</div>
-            </div>
-
-            <div class="input-container">
-                <!-- <div class="pdf-box" id="pdf-box" style="display: none;">
+        <div class="input-container">
+          <!-- <div class="pdf-box" id="pdf-box" style="display: none;">
 
                 </div> -->
-                <ion-icon name="cloud-upload" id="upload"></ion-icon>
-                <input type="file" id="file-upload" style="display: none;" accept="application/pdf" enctype="multipart/form-data">
-                <input type="text" name="chat" id="chat-input" placeholder="Tulis pesan...">
-                <ion-icon name="send" id="send-button"></ion-icon>
-            </div>
+          <ion-icon name="cloud-upload" id="upload"></ion-icon>
+          <input
+            type="file"
+            id="file-upload"
+            style="display: none"
+            accept="application/pdf"
+            enctype="multipart/form-data"
+          />
+          <input
+            type="text"
+            name="chat"
+            id="chat-input"
+            placeholder="Tulis pesan..."
+          />
+          <ion-icon name="send" id="send-button"></ion-icon>
         </div>
+      </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const pdfId = "{{ pdf_id }}";
-            if (pdfId) {
-                localStorage.setItem('pdf_id', pdfId);
-                loadHistory();
-            }
-        });
-    </script>    
+      document.addEventListener("DOMContentLoaded", () => {
+        const pdfId = "{{ pdf_id }}";
+        if (pdfId) {
+          localStorage.setItem("pdf_id", pdfId);
+          loadHistory();
+        }
+      });
+    </script>
 
     <script src="{{ url_for('static', filename='js/script.js')}}"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-</body>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
 </html>
